@@ -15,8 +15,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         {/* Écran de chargement : visible seulement tant qu'aucune page n'est affichée */}
-        <div className="boot" aria-hidden="true"><div className="logo">Chendam</div></div>
+        <div className="boot" aria-hidden="true"><img src="/logo.webp" alt="" className="bootlogo" /></div>
       </body>
     </html>
   );
-        }
+          }
