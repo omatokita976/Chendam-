@@ -1,54 +1,80 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { supabase, type Msg } from "@/lib/supabase";
+import { useMe } from "@/lib/useMe";
+import Shell, { Av } from "@/components/Shell";
 
-export default function Login() {
-  const router = useRouter();
-  const [signup, setSignup] = useState(true);
-  const [email, setEmail] = useState("");
-  const [pw, setPw] = useState("");
-  const [pw2, setPw2] = useState("");
-  const [msg, setMsg] = useState("");
-  const [err, setErr] = useState("");
+type Row = { id: string; name: string; photo_url: string | null; last: string; unread: number; started: boolean };
+const LABEL = { image: "📷 Photo", video: "🎥 Vidéo", audio: "🎤 Message vocal" };
 
-  const submit = async () => {
-    setErr(""); setMsg("");
-    const m = email.trim().toLowerCase();
-    if (!/^[^@\s]+@gmail\.com$/.test(m)) return setErr("Entre une adresse Gmail valide, par exemple nom@gmail.com.");
-    if (signup) {
-      if (pw.length < 8) return setErr("Le mot de passe doit avoir au moins 8 caractères.");
-      if (pw !== pw2) return setErr("Les deux mots de passe sont différents.");
-      const { error } = await supabase.auth.signUp({ email: m, password: pw });
-      if (error) return setErr(error.message);
-      setMsg("Compte créé. Ouvre ta boîte Gmail et clique sur le lien de confirmation, puis connecte-toi.");
-      setSignup(false);
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email: m, password: pw });
-      if (error) return setErr("Email ou mot de passe incorrect, ou email pas encore confirmé.");
-      router.replace("/");
-    }
-  };
+export default function Messages() {
+  const me = useMe();
+  const [rows, setRows] = useState<Row[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  const load = useCallback(async () => {
+    if (!me) return;
+    // 1. Les conversations déjà commencées
+    const { data } = await supabase.from("messages").select("*")
+      .or(`sender_id.eq.${me.id},receiver_id.eq.${me.id}`)
+      .order("created_at", { ascending: false }).limit(300);
+    const by = new Map<string, { last: Msg; unread: number }>();
+    ((data as Msg[]) ?? []).forEach((m) => {
+      const o = m.sender_id === me.id ? m.receiver_id : m.sender_id;
+      const e = by.get(o) ?? { last: m, unread: 0 };
+      if (m.receiver_id === me.id && !m.read_at) e.unread++;
+      by.set(o, e);
+    });
+    const order = [...by.keys()]; // du plus récent au plus ancien
+
+    // 2. Tous mes amis, pour pouvoir écrire à chacun
+    const { data: fs } = await supabase.from("friendships").select("requester,addressee")
+      .eq("status", "accepted").or(`requester.eq.${me.id},addressee.eq.${me.id}`);
+    const friends = (fs ?? []).map((f: any) => (f.requester === me.id ? f.addressee : f.requester));
+
+    const ids = [...new Set([...order, ...friends])];
+    const { data: ps } = ids.length ? await supabase.from("profiles").select("id,name,photo_url").in("id", ids) : { data: [] };
+    const list: Row[] = (ps ?? []).map((p: any) => {
+      const e = by.get(p.id);
+      return {
+        id: p.id, name: p.name, photo_url: p.photo_url, started: !!e, unread: e?.unread ?? 0,
+        last: e ? (e.last.body || (e.last.media_type ? LABEL[e.last.media_type] : "")) : "Vous êtes amis : dis bonjour 👋",
+      };
+    });
+    const rank = (r: Row) => (r.started ? order.indexOf(r.id) : 1000);
+    list.sort((a, b) => (b.unread > 0 ? 1 : 0) - (a.unread > 0 ? 1 : 0) || rank(a) - rank(b) || a.name.localeCompare(b.name));
+    setRows(list);
+    setLoaded(true);
+  }, [me]);
+
+  useEffect(() => {
+    if (!me) return;
+    load();
+    const ch = supabase.channel("inbox").on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `receiver_id=eq.${me.id}` }, load).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [me, load]);
+  if (!me) return null;
 
   return (
-    <div className="wrap">
-      <header className="top"><div><div className="logo">Chendam</div><div className="stripe"><i /><i /><i /></div></div></header>
-      <div className="card">
-        <h2>La seconde main, version Cameroun</h2>
-        <p className="meta">Vends ce que tu n&apos;utilises plus. Trouve de bonnes affaires près de chez toi.</p>
-        <div className="seg">
-          <button className={signup ? "on" : ""} onClick={() => setSignup(true)}>Créer un compte</button>
-          <button className={signup ? "" : "on"} onClick={() => setSignup(false)}>Se connecter</button>
+    <Shell me={me}>
+      <h2 style={{ marginBottom: 12 }}>Messages</h2>
+      {loaded && rows.length === 0 && (
+        <div className="card">
+          Aucune conversation pour le moment. Ajoute des amis dans l&apos;onglet <Link href="/amis" className="ghost-link">Amis</Link>, ou touche « Écrire au vendeur » sur un article.
         </div>
-        <label htmlFor="e">Adresse Gmail</label>
-        <input id="e" type="email" autoComplete="email" placeholder="nom@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <label htmlFor="p">Mot de passe</label>
-        <input id="p" type="password" autoComplete={signup ? "new-password" : "current-password"} placeholder="8 caractères minimum" value={pw} onChange={(e) => setPw(e.target.value)} />
-        {signup && (<><label htmlFor="p2">Confirmer le mot de passe</label><input id="p2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} /></>)}
-        {err && <p className="err">{err}</p>}
-        {msg && <p className="note">{msg}</p>}
-        <p><button style={{ width: "100%" }} onClick={submit}>{signup ? "Créer mon compte" : "Me connecter"}</button></p>
-      </div>
-    </div>
+      )}
+      {rows.map((r) => (
+        <Link key={r.id} href={`/messages/${r.id}`} className="card convo">
+          <Av name={r.name} url={r.photo_url} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <strong>{r.name}</strong>
+            <div className="meta" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.last}</div>
+          </div>
+          {r.unread > 0 ? <span className="badge">{r.unread}</span> : !r.started && <span className="tag">Ami</span>}
+        </Link>
+      ))}
+    </Shell>
   );
-}
+        }
+      
