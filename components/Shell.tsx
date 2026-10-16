@@ -46,11 +46,13 @@ export default function Shell({ me, children }: { me: Me; children: React.ReactN
         {children}
       </div>
       <nav><div>
-        {tab("/", "Accueil")}{tab("/vendre", "Vendre")}
-        {tab("/amis", <>Amis{inv > 0 && <span className="badge">{inv}</span>}</>)}
-        {tab("/messages", <>Messages{n > 0 && <span className="badge">{n}</span>}</>)}
-        {tab("/profil", "Profil")}
+        {tab("/", <><span className="ic">🏠</span>Accueil</>)}
+        {tab("/vendre", <><span className="ic">➕</span>Vendre</>)}
+        {tab("/amis", <><span className="ic">👥</span>Amis{inv > 0 && <span className="badge">{inv}</span>}</>)}
+        {tab("/messages", <><span className="ic">💬</span>Messages{n > 0 && <span className="badge">{n}</span>}</>)}
+        {tab("/profil", <><span className="ic">👤</span>Profil</>)}
       </div></nav>
     </>
   );
-}
+  }
+            
