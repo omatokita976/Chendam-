@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Me } from "@/lib/useMe";
+import Marquee from "./Marquee";
 
 export function Av({ name, url, big }: { name: string; url?: string | null; big?: boolean }) {
   return <div className={"av" + (big ? " big" : "")}>{url ? <img alt="" src={url} /> : name.charAt(0).toUpperCase()}</div>;
@@ -45,7 +46,9 @@ export default function Shell({ me, children }: { me: Me; children: React.ReactN
         {me.is_banned && <div className="card err">Ton compte est suspendu : tu ne peux plus publier ni commenter.</div>}
         {children}
       </div>
-      <nav><div>
+      <nav>
+      {path === "/" && <Marquee />}
+      <div>
         {tab("/", <><span className="ic">🏠</span>Accueil</>)}
         {tab("/vendre", <><span className="ic">➕</span>Vendre</>)}
         {tab("/amis", <><span className="ic">👥</span>Amis{inv > 0 && <span className="badge">{inv}</span>}</>)}
@@ -54,5 +57,4 @@ export default function Shell({ me, children }: { me: Me; children: React.ReactN
       </div></nav>
     </>
   );
-  }
-            
+          }
