@@ -46,7 +46,7 @@ export default function EnablePush() {
     }
   };
 
-  if (state === "checking") return null;
+  if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || state === "checking") return null;
   return (
     <div className="card">
       <strong>Notifications sur le téléphone</strong>
@@ -58,4 +58,4 @@ export default function EnablePush() {
       {err && <p className="err">{err}</p>}
     </div>
   );
-}
+                                                             }
