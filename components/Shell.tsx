@@ -40,7 +40,7 @@ export default function Shell({ me, children }: { me: Me; children: React.ReactN
     <>
       <div className="wrap">
         <header className="top">
-          <div><div className="logo">Chendam</div><div className="stripe"><i /><i /><i /></div></div>
+          <div className="brandrow"><img src="/logo.webp" alt="" className="mark" /><div><div className="logo">Chendam</div><div className="stripe"><i /><i /><i /></div></div></div>
           <Link href="/notifications" className="bell" aria-label="Notifications">🔔{nn > 0 && <span className="badge">{nn}</span>}</Link>
         </header>
         {me.is_banned && <div className="card err">Ton compte est suspendu : tu ne peux plus publier ni commenter.</div>}
@@ -57,4 +57,5 @@ export default function Shell({ me, children }: { me: Me; children: React.ReactN
       </div></nav>
     </>
   );
-          }
+      }
+              
