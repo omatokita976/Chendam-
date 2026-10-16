@@ -34,12 +34,13 @@ export default function Login() {
   return (
     <div className="land">
       <header className="land-top">
-        <div className="logo">Chendam</div>
+        <div className="brandrow"><img src="/logo.webp" alt="" className="mark" /><div className="logo">Chendam</div></div>
         <span className="flagchip">🇨🇲 Cameroun</span>
       </header>
       <main className="land-main">
+        <img src="/logo.webp" alt="Chendam" className="sticker" />
         <p className="eyebrow"><span className="dot" />Est. 2026 — Seconde main</p>
-        <h1 className="mega">ACHÈTE.<br />VENDS.<br />RECOMMENCE<em className="sq" /></h1>
+        <h1 className="mega phrase">CE QUE TU NE<br />TCHOMBÉ PLUS,<br />CAME NTOUM<em className="sq" /></h1>
         <p className="lead">La seconde main pensée pour les quartiers, les marchés et les bonnes affaires qu&apos;on ne trouve nulle part ailleurs.</p>
         <div className="tri"><i /><i /><i /></div>
 
@@ -64,5 +65,5 @@ export default function Login() {
       <Marquee />
     </div>
   );
-        }
-            
+  }
+  
