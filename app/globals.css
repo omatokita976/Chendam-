@@ -95,4 +95,42 @@ nav .badge{position:absolute;top:3px;left:calc(50% + 6px);margin:0}
 .wrap ~ .boot,.hero ~ .boot{display:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 @media(prefers-reduced-motion:reduce){.boot .logo{animation:none}}
+
+/* ===== Page d'entrée : noir et or, esprit "drop" ===== */
+.marquee{background:#0A0F0C;color:#FFC21A;text-transform:uppercase;letter-spacing:.2em;font-size:11px;font-weight:700;border-radius:0;margin:0;border-top:1px solid #2A312C}
+.marquee .track{padding:10px 0;gap:30px}
+.marquee b{color:#CE1126;margin-left:30px}
+nav .marquee{display:block}
+.land{--gold:#FFC21A;--bg:#0A0F0C;--card:#111713;--ink:#fff;--mute:#9AA39C;--line:#2A312C;position:relative;min-height:100vh;background:#0A0F0C;color:#fff;padding:0 18px 70px;overflow-x:hidden}
+.land::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% -5%,rgba(255,194,26,.16),transparent 55%)}
+.land>*{position:relative}
+.land .marquee{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px)}
+.land-top{display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 18px) 0 16px;border-bottom:1px solid var(--line);margin:0 -18px;padding-left:18px;padding-right:18px}
+.land-top .logo{font-size:26px;font-weight:800}
+.flagchip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.land-main{max-width:520px;margin:0 auto;padding-top:34px}
+.eyebrow{display:flex;align-items:center;gap:10px;margin:0;font:700 12px "Space Grotesk","Nunito Sans",sans-serif;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+.eyebrow.small{margin:26px 0 12px;color:var(--mute)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.mega{font-family:"Space Grotesk","Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(40px,12.5vw,76px);line-height:.96;letter-spacing:-.035em;margin:16px 0 18px;color:#fff}
+.sq{display:inline-block;width:.16em;height:.16em;margin-left:.04em;background:var(--gold);box-shadow:0 0 18px var(--gold)}
+.lead{font-size:18px;line-height:1.55;color:var(--mute);margin:0 0 20px}
+.tri{display:flex;height:5px;max-width:240px;border-radius:3px;overflow:hidden}
+.tri i{flex:1}.tri i:nth-child(1){background:#0B8A4A}.tri i:nth-child(2){background:#CE1126}.tri i:nth-child(3){background:#FFC21A}
+.frame{position:relative;border:1px solid var(--line);padding:22px 18px 18px;background:rgba(17,23,19,.7)}
+.frame .c{position:absolute;width:22px;height:22px;border:3px solid var(--gold)}
+.c.tl{top:-2px;left:-2px;border-right:0;border-bottom:0}.c.tr{top:-2px;right:-2px;border-left:0;border-bottom:0}
+.c.bl{bottom:-2px;left:-2px;border-right:0;border-top:0}.c.br{bottom:-2px;right:-2px;border-left:0;border-top:0}
+.tabs{display:flex;gap:6px;margin-bottom:6px}
+.land button{box-shadow:none}
+.tabs button{flex:1;background:transparent;color:var(--mute);border:1px solid var(--line);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:11px 6px}
+.tabs button.on{background:var(--gold);border-color:var(--gold);color:#0A0F0C}
+.land label{font:600 11px "Space Grotesk","Nunito Sans",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.land input{background:#0A0F0C;border:1px solid var(--line);color:#fff;border-radius:12px}
+.land input::placeholder{color:#5d665f}
+.land .note{background:#0A0F0C;border:1px solid var(--line);color:#cfd6d0}
+.land .err{color:#FF6B6B}
+.pill{width:100%;margin-top:18px;background:var(--gold);color:#0A0F0C;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:17px;border-radius:999px}
+.land .pill{box-shadow:0 0 30px rgba(255,194,26,.35)}
+.foot{margin:18px 0 0;text-align:center;font-size:12px;letter-spacing:.08em;color:#6f7971}
       
