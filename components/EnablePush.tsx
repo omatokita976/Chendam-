@@ -40,7 +40,7 @@ export default function EnablePush() {
       const { error } = await supabase.rpc("register_push", { p_endpoint: j.endpoint, p_p256dh: j.keys!.p256dh, p_auth: j.keys!.auth });
       if (error) throw error;
       setState("on");
-      reg.showNotification("Chendam", { body: "Notifications activées sur ce téléphone.", icon: "/icon-192.png", vibrate: [200, 100, 200] });
+      reg.showNotification("Chendam", { body: "Notifications activées sur ce téléphone.", icon: "/icon-192.png", vibrate: [200, 100, 200] } as NotificationOptions);
     } catch (e: any) {
       setErr("Activation impossible : " + (e?.message ?? "erreur"));
     }
