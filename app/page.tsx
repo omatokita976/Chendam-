@@ -4,6 +4,7 @@ import Link from "next/link";
 import { supabase, fcfa } from "@/lib/supabase";
 import { useMe } from "@/lib/useMe";
 import Shell, { Av } from "@/components/Shell";
+import Marquee from "@/components/Marquee";
 import ReportButton from "@/components/ReportButton";
 
 type Post = {
@@ -42,6 +43,7 @@ export default function Home() {
 
   return (
     <Shell me={me}>
+      <Marquee />
       {posts.length === 0 && <div className="card">Aucun article pour le moment. Publie le premier dans l&apos;onglet Vendre.</div>}
       {posts.map((p) => {
         const liked = p.likes.some((l) => l.user_id === me.id);
@@ -67,4 +69,5 @@ export default function Home() {
       })}
     </Shell>
   );
-}
+    }
+      
