@@ -58,4 +58,4 @@ export default function EnablePush() {
       {err && <p className="err">{err}</p>}
     </div>
   );
-                                                             }
+        }
