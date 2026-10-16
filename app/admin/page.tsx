@@ -11,7 +11,8 @@ type R = {
   reported: { id: string; name: string; is_banned: boolean; photo_url: string | null } | null;
   posts: { id: number; title: string; photo_urls: string[]; status: string } | null;
 };
-type U = { id: string; name: string; photo_url: string | null; ville: string | null; is_banned: boolean; role: string };
+type U = { id: string; name: string; photo_url: string | null; ville: string | null; is_banned: boolean; role: string; created_at?: string };
+type PostRow = { id: number; title: string; price_fcfa: number; photo_urls: string[]; status: string; created_at: string; profiles: { name: string } | null };
 
 // Double authentification : code à 6 chiffres d'une application (Google Authenticator, etc.)
 function Mfa({ onDone }: { onDone: () => void }) {
@@ -62,13 +63,16 @@ function Mfa({ onDone }: { onDone: () => void }) {
 export default function Admin() {
   const me = useMe();
   const [gate, setGate] = useState<"checking" | "mfa" | "ok">("checking");
-  const [tab, setTab] = useState<"reports" | "users">("reports");
+  const [tab, setTab] = useState<"stats" | "reports" | "posts" | "users">("stats");
   const [showDone, setShowDone] = useState(false);
   const [rs, setRs] = useState<R[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [q, setQ] = useState("");
   const [us, setUs] = useState<U[]>([]);
   const [err, setErr] = useState("");
+  const [st, setSt] = useState<Record<string, number>>({});
+  const [recent, setRecent] = useState<U[]>([]);
+  const [ps, setPs] = useState<PostRow[]>([]);
 
   useEffect(() => {
     if (!me || me.role !== "admin") return;
@@ -90,6 +94,33 @@ export default function Admin() {
     }
   }, []);
   useEffect(() => { if (gate === "ok") loadR(); }, [gate, loadR]);
+
+  // Les chiffres du site
+  const loadStats = useCallback(async () => {
+    const cnt = async (q: any) => (await q).count ?? 0;
+    const head = { count: "exact", head: true } as const;
+    const week = new Date(Date.now() - 7 * 864e5).toISOString();
+    const day = new Date(Date.now() - 864e5).toISOString();
+    const [users, newUsers, today, banned, active, openR] = await Promise.all([
+      cnt(supabase.from("profiles").select("id", head)),
+      cnt(supabase.from("profiles").select("id", head).gte("created_at", week)),
+      cnt(supabase.from("profiles").select("id", head).gte("created_at", day)),
+      cnt(supabase.from("profiles").select("id", head).eq("is_banned", true)),
+      cnt(supabase.from("posts").select("id", head).eq("status", "active")),
+      cnt(supabase.from("reports").select("id", head).eq("status", "open")),
+    ]);
+    setSt({ users, newUsers, today, banned, active, openR });
+    const { data } = await supabase.from("profiles").select("id,name,photo_url,ville,is_banned,role,created_at")
+      .order("created_at", { ascending: false }).limit(10);
+    setRecent((data as U[]) ?? []);
+  }, []);
+  // Toutes les publications, pour pouvoir en supprimer une directement
+  const loadP = useCallback(async () => {
+    const { data } = await supabase.from("posts").select("id,title,price_fcfa,photo_urls,status,created_at,profiles(name)")
+      .order("created_at", { ascending: false }).limit(60);
+    setPs((data as any) ?? []);
+  }, []);
+  useEffect(() => { if (gate === "ok") { loadStats(); loadP(); } }, [gate, loadStats, loadP]);
 
   const loadU = useCallback(async () => {
     let query = supabase.from("profiles").select("id,name,photo_url,ville,is_banned,role").limit(40);
@@ -137,17 +168,65 @@ export default function Admin() {
     loadU();
   };
 
+  const removePost = async (p: PostRow) => {
+    if (!confirm(`Supprimer la publication « ${p.title} » ?`)) return;
+    setErr("");
+    fail((await supabase.from("posts").delete().eq("id", p.id)).error);
+    loadP(); loadStats();
+  };
+
   const open = rs.filter((r) => r.status === "open");
   const shown = showDone ? rs.filter((r) => r.status !== "open") : open;
 
   return (
     <Shell me={me}>
       <h2 style={{ marginBottom: 4 }}>Espace admin</h2>
-      <div className="seg">
+      <div className="seg" style={{ flexWrap: "wrap", borderRadius: 24 }}>
+        <button className={tab === "stats" ? "on" : ""} onClick={() => { setTab("stats"); loadStats(); }}>Chiffres</button>
         <button className={tab === "reports" ? "on" : ""} onClick={() => setTab("reports")}>Signalements ({open.length})</button>
+        <button className={tab === "posts" ? "on" : ""} onClick={() => { setTab("posts"); loadP(); }}>Publications</button>
         <button className={tab === "users" ? "on" : ""} onClick={() => setTab("users")}>Comptes</button>
       </div>
       {err && <p className="err">{err}</p>}
+
+      {tab === "stats" && (<>
+        <div className="statgrid">
+          <div className="stat big"><b>{st.users ?? "…"}</b><span>personnes inscrites sur Chendam</span></div>
+          <div className="stat"><b>{st.today ?? "…"}</b><span>inscrits ces 24 h</span></div>
+          <div className="stat"><b>{st.newUsers ?? "…"}</b><span>inscrits cette semaine</span></div>
+          <div className="stat"><b>{st.active ?? "…"}</b><span>articles en ligne</span></div>
+          <div className="stat"><b>{st.openR ?? "…"}</b><span>signalements à traiter</span></div>
+          <div className="stat"><b>{st.banned ?? "…"}</b><span>comptes bannis</span></div>
+        </div>
+        <h3 style={{ margin: "18px 0 10px" }}>Dernières inscriptions</h3>
+        {recent.map((u) => (
+          <Link key={u.id} href={`/profil/${u.id}`} className="card convo">
+            <Av name={u.name} url={u.photo_url} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <strong>{u.name}</strong>
+              <div className="meta">{u.ville || "Ville non indiquée"}{u.created_at ? ` · ${new Date(u.created_at).toLocaleDateString("fr-FR")}` : ""}</div>
+            </div>
+            {u.is_banned && <span className="tag" style={{ color: "var(--r)" }}>Banni</span>}
+          </Link>
+        ))}
+      </>)}
+
+      {tab === "posts" && (<>
+        {ps.length === 0 && <div className="card meta">Aucune publication.</div>}
+        {ps.map((p) => (
+          <div className="card" key={p.id}>
+            <div className="row">
+              <img alt={p.title} src={p.photo_urls[0]} style={{ width: 72, height: 72, borderRadius: 12, objectFit: "cover" }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <strong>{p.title}</strong>
+                <div className="meta">{p.profiles?.name ?? "?"} · {new Date(p.created_at).toLocaleDateString("fr-FR")}</div>
+                <span className="price">{p.price_fcfa.toLocaleString("fr-FR")} FCFA</span>
+              </div>
+            </div>
+            <p><button onClick={() => removePost(p)}>Supprimer la publication</button></p>
+          </div>
+        ))}
+      </>)}
 
       {tab === "reports" && (<>
         <p><button className="ghost" onClick={() => setShowDone(!showDone)}>{showDone ? "Voir les signalements à traiter" : "Voir les signalements traités"}</button></p>
@@ -200,4 +279,4 @@ export default function Admin() {
       </>)}
     </Shell>
   );
-}
+    }
