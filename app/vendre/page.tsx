@@ -40,7 +40,7 @@ export default function Vendre() {
         <input id="t" placeholder="Ex. Fer à repasser Philips" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} />
         <label htmlFor="p">Prix (FCFA)</label>
         <input id="p" type="number" inputMode="numeric" min="0" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} />
-        <div className="note">Le paiement se fait directement entre toi et l&apos;acheteur. Mets-vous d&apos;accord par messages. Conseil : paie et fais-toi payer à la remise de l&apos;article.</div>
+        <div className="note">Le paiement se règle directement entre l&apos;acheteur et toi. Mettez-vous d&apos;accord par message. Conseil : donne l&apos;article et encaisse le paiement en main propre, au même moment.</div>
         <label htmlFor="e">État</label>
         <select id="e" value={f.etat} onChange={(e) => setF({ ...f, etat: e.target.value })}>
           <option>Comme neuf</option><option>Très bon état</option><option>Bon état</option><option>À réparer</option>
@@ -55,4 +55,5 @@ export default function Vendre() {
       </div>
     </Shell>
   );
-}
+                                                  }
+    
