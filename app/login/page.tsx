@@ -32,18 +32,21 @@ export default function Login() {
   };
 
   return (
-    <div className="hero">
-      <Marquee />
-      <div className="wrap">
-        <div className="brand">
-          <div className="logo">Chendam</div>
-          <div className="stripe"><i /><i /><i /></div>
-          <h1>Vends. Achète.<br />100 % Cameroun.</h1>
-          <p>Donne une seconde vie à ce que tu n&apos;utilises plus, et trouve de bonnes affaires près de chez toi.</p>
-          <div className="chips"><span>📸 Publie en 1 minute</span><span>💬 Discute en direct</span><span>🤝 Entre Camerounais</span></div>
-        </div>
-        <div className="card">
-          <div className="seg">
+    <div className="land">
+      <header className="land-top">
+        <div className="logo">Chendam</div>
+        <span className="flagchip">🇨🇲 Cameroun</span>
+      </header>
+      <main className="land-main">
+        <p className="eyebrow"><span className="dot" />Est. 2026 — Seconde main</p>
+        <h1 className="mega">ACHÈTE.<br />VENDS.<br />RECOMMENCE<em className="sq" /></h1>
+        <p className="lead">La seconde main pensée pour les quartiers, les marchés et les bonnes affaires qu&apos;on ne trouve nulle part ailleurs.</p>
+        <div className="tri"><i /><i /><i /></div>
+
+        <p className="eyebrow small">Rejoins la communauté</p>
+        <div className="frame">
+          <i className="c tl" /><i className="c tr" /><i className="c bl" /><i className="c br" />
+          <div className="tabs">
             <button className={signup ? "on" : ""} onClick={() => setSignup(true)}>Créer un compte</button>
             <button className={signup ? "" : "on"} onClick={() => setSignup(false)}>Se connecter</button>
           </div>
@@ -54,9 +57,12 @@ export default function Login() {
           {signup && (<><label htmlFor="p2">Confirmer le mot de passe</label><input id="p2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} /></>)}
           {err && <p className="err">{err}</p>}
           {msg && <p className="note">{msg}</p>}
-          <p><button style={{ width: "100%" }} onClick={submit}>{signup ? "Créer mon compte" : "Me connecter"}</button></p>
+          <button className="pill" onClick={submit}>{signup ? "Créer mon compte" : "Me connecter"}</button>
         </div>
-      </div>
+        <p className="foot">Gmail obligatoire · Paiement direct entre vendeur et acheteur</p>
+      </main>
+      <Marquee />
     </div>
   );
-            }
+        }
+            
