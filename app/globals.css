@@ -133,3 +133,13 @@ nav .marquee{display:block}
 .pill{width:100%;margin-top:18px;background:var(--gold);color:#0A0F0C;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:17px;border-radius:999px}
 .land .pill{box-shadow:0 0 30px rgba(255,194,26,.35)}
 .foot{margin:18px 0 0;text-align:center;font-size:12px;letter-spacing:.08em;color:#6f7971}
+
+/* ===== Admin : chiffres ===== */
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 6px 18px rgba(10,30,18,.08)}
+.stat b{display:block;font:800 30px "Bricolage Grotesque",sans-serif;color:var(--g)}
+.stat span{color:var(--mute);font-size:14px}
+.stat.big{grid-column:1/-1;background:linear-gradient(135deg,#0B6B3A,#064527);border-color:transparent}
+.stat.big b{font-size:54px;color:#FFC21A}
+.stat.big span{color:#e6efe8;font-size:16px}
+         
