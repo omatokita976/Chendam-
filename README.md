@@ -36,4 +36,4 @@ Dans SQL Editor, exécute dans l'ordre : `chendam_supabase.sql`, `chendam_storag
 3. Supabase > Authentication > Multi-Factor : vérifie que TOTP est activé.
 4. Connecte-toi, ouvre Profil > Espace admin. La première fois, scanne le QR code avec Google Authenticator (ou Authy). Ensuite, chaque connexion admin demande le code à 6 chiffres.
    Les pouvoirs admin (bannir, supprimer, voir les preuves) ne fonctionnent qu'avec ce code validé, même si ton mot de passe est volé.
-5. Si tu perds ton téléphone : Supabase > Authentication > Users > ton compte > supprime le facteur MFA, puis recommence l'étape 4.
+5. Si tu perds ton téléphone : Supabase > Authentication > Users > ton compte > supprime le facteur MFA, puis recommence l'étape 4. 
