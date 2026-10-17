@@ -73,6 +73,7 @@ export default function Admin() {
   const [st, setSt] = useState<Record<string, number>>({});
   const [recent, setRecent] = useState<U[]>([]);
   const [ps, setPs] = useState<PostRow[]>([]);
+  const [onlyBanned, setOnlyBanned] = useState(false);
 
   useEffect(() => {
     if (!me || me.role !== "admin") return;
@@ -116,18 +117,19 @@ export default function Admin() {
   }, []);
   // Toutes les publications, pour pouvoir en supprimer une directement
   const loadP = useCallback(async () => {
-    const { data } = await supabase.from("posts").select("id,title,price_fcfa,photo_urls,status,created_at,profiles(name)")
+    const { data } = await supabase.from("posts").select("id,title,price_fcfa,photo_urls,status,created_at,profiles!seller_id(name)")
       .order("created_at", { ascending: false }).limit(60);
     setPs((data as any) ?? []);
   }, []);
   useEffect(() => { if (gate === "ok") { loadStats(); loadP(); } }, [gate, loadStats, loadP]);
 
   const loadU = useCallback(async () => {
-    let query = supabase.from("profiles").select("id,name,photo_url,ville,is_banned,role").limit(40);
-    query = q.trim().length >= 2 ? query.ilike("name", `%${q.trim()}%`) : query.eq("is_banned", true);
+    let query = supabase.from("profiles").select("id,name,photo_url,ville,is_banned,role,created_at").order("created_at", { ascending: false }).limit(40);
+    if (q.trim().length >= 2) query = query.ilike("name", `%${q.trim()}%`);
+    if (onlyBanned) query = query.eq("is_banned", true);
     const { data } = await query;
     setUs((data as U[]) ?? []);
-  }, [q]);
+  }, [q, onlyBanned]);
   useEffect(() => {
     if (gate !== "ok" || tab !== "users") return;
     const t = setTimeout(loadU, 300);
@@ -261,9 +263,10 @@ export default function Admin() {
       </>)}
 
       {tab === "users" && (<>
-        <input placeholder="Chercher un compte par nom (sinon : comptes bannis)" aria-label="Chercher un compte" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input placeholder="Chercher un compte par nom" aria-label="Chercher un compte" value={q} onChange={(e) => setQ(e.target.value)} />
+        <p><button className="ghost" onClick={() => setOnlyBanned(!onlyBanned)}>{onlyBanned ? "Voir tous les comptes" : "Voir seulement les comptes bannis"}</button></p>
         <div style={{ marginTop: 12 }}>
-          {us.length === 0 && <div className="card meta">{q.trim().length >= 2 ? "Aucun compte trouvé." : "Aucun compte banni."}</div>}
+          {us.length === 0 && <div className="card meta">{onlyBanned ? "Aucun compte banni." : "Aucun compte trouvé."}</div>}
           {us.map((u) => (
             <div className="card row" style={{ flexWrap: "wrap" }} key={u.id}>
               <Link href={`/profil/${u.id}`} className="convo" style={{ flex: 1, minWidth: 140 }}>
@@ -279,4 +282,5 @@ export default function Admin() {
       </>)}
     </Shell>
   );
-    }
+}
+  
