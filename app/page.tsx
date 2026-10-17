@@ -17,14 +17,24 @@ export default function Home() {
   const me = useMe();
   const [posts, setPosts] = useState<Post[]>([]);
   const [txt, setTxt] = useState<Record<number, string>>({});
+  const [err, setErr] = useState("");
 
   const load = async () => {
-    const { data } = await supabase.from("posts")
-      .select("*, profiles(name,photo_url), likes(user_id), comments(id,body,profiles(name))")
+    const { data, error } = await supabase.from("posts")
+      .select("*, profiles!seller_id(name,photo_url), likes(user_id), comments(id,body,profiles!user_id(name))")
       .eq("status", "active").order("created_at", { ascending: false });
-    setPosts((data as any) ?? []);
+    setErr(error ? error.message : "");
+    if (!error) setPosts((data as any) ?? []);
   };
-  useEffect(() => { if (me) load(); }, [me]);
+  // Les nouveaux articles des autres apparaissent tout seuls : toutes les 30 secondes et au retour sur le site
+  useEffect(() => {
+    if (!me) return;
+    load();
+    const t = setInterval(load, 30000);
+    const onVis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", onVis); };
+  }, [me]);
   if (!me) return null;
 
   const like = async (p: Post) => {
@@ -42,7 +52,9 @@ export default function Home() {
 
   return (
     <Shell me={me}>
-      {posts.length === 0 && <div className="card">Aucun article pour le moment. Publie le premier dans l&apos;onglet Vendre.</div>}
+      <p style={{ margin: "0 0 8px" }}><button className="ghost" onClick={load}>↻ Actualiser</button></p>
+      {err && <div className="card err">Impossible de charger les articles : {err}</div>}
+      {posts.length === 0 && !err && <div className="card">Aucun article pour le moment. Publie le premier dans l&apos;onglet Vendre.</div>}
       {posts.map((p) => {
         const liked = p.likes.some((l) => l.user_id === me.id);
         return (
@@ -67,4 +79,5 @@ export default function Home() {
       })}
     </Shell>
   );
-          }
+                                    }
+              
