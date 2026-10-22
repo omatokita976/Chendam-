@@ -12,6 +12,7 @@ export default function Vendre() {
   const [file, setFile] = useState<File | null>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [adult, setAdult] = useState(false);
   if (!me) return null;
   const price = Number(f.price) || 0;
 
@@ -25,7 +26,7 @@ export default function Vendre() {
     const url = supabase.storage.from("photos").getPublicUrl(path).data.publicUrl;
     const { error } = await supabase.from("posts").insert({
       seller_id: me.id, title: f.title.trim(), price_fcfa: price, etat: f.etat,
-      ville: f.ville.trim() || me.ville || "Cameroun", photo_urls: [url],
+      ville: f.ville.trim() || me.ville || "Cameroun", photo_urls: [url], adult,
     });
     setBusy(false);
     if (error) return setErr(error.message);
@@ -47,6 +48,8 @@ export default function Vendre() {
         </select>
         <label htmlFor="v">Ville</label>
         <input id="v" placeholder="Douala, Yaoundé, Bamenda…" value={f.ville} onChange={(e) => setF({ ...f, ville: e.target.value })} />
+        <label className="check"><input type="checkbox" checked={adult} onChange={(e) => setAdult(e.target.checked)} /><span>Article pour adultes (jouets intimes, cartes érotiques, lingerie…). La photo sera floutée tant qu&apos;on ne la touche pas.</span></label>
+        <p className="meta">Photo de l&apos;objet seul uniquement : aucune personne nue, aucune image explicite.</p>
         <label htmlFor="f">Photo de l&apos;article (obligatoire)</label>
         <input id="f" type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         {file && <img className="ph" alt="Aperçu" src={URL.createObjectURL(file)} />}
@@ -55,4 +58,5 @@ export default function Vendre() {
       </div>
     </Shell>
   );
-        }
+}
+  
