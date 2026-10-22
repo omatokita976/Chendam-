@@ -5,9 +5,10 @@ import { supabase, fcfa } from "@/lib/supabase";
 import { useMe } from "@/lib/useMe";
 import Shell, { Av } from "@/components/Shell";
 import ReportButton from "@/components/ReportButton";
+import AdultImage from "@/components/AdultImage";
 
 type Post = {
-  id: number; seller_id: string; title: string; price_fcfa: number; etat: string; ville: string | null; photo_urls: string[];
+  id: number; seller_id: string; title: string; price_fcfa: number; etat: string; ville: string | null; photo_urls: string[]; adult: boolean;
   profiles: { name: string; photo_url: string | null };
   likes: { user_id: string }[];
   comments: { id: number; body: string; profiles: { name: string } }[];
@@ -60,9 +61,9 @@ export default function Home() {
         return (
           <article className="card" key={p.id}>
             <Link href={`/profil/${p.seller_id}`} className="convo"><Av name={p.profiles.name} url={p.profiles.photo_url} /><div><strong>{p.profiles.name}</strong><div className="meta">{p.ville}</div></div></Link>
-            <img className="ph" alt={p.title} src={p.photo_urls[0]} />
+            <AdultImage adult={p.adult} className="ph" alt={p.title} src={p.photo_urls[0]} />
             <h3>{p.title}</h3>
-            <div className="row" style={{ margin: "6px 0" }}><span className="price">{fcfa(p.price_fcfa)}</span><span className="tag">{p.etat}</span></div>
+            <div className="row" style={{ margin: "6px 0" }}><span className="price">{fcfa(p.price_fcfa)}</span><span className="tag">{p.etat}</span>{p.adult && <span className="tag">18+</span>}</div>
             <div className="row">
               <button className={"ghost" + (liked ? " on" : "")} onClick={() => like(p)} aria-label="J'aime">{liked ? "♥" : "♡"} {p.likes.length}</button>
               {p.seller_id !== me.id && <Link className="ghost-link" href={`/messages/${p.seller_id}`}>Écrire au vendeur</Link>}
@@ -79,5 +80,4 @@ export default function Home() {
       })}
     </Shell>
   );
-                                    }
-              
+            }
