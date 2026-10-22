@@ -162,4 +162,28 @@ nav .marquee{display:block}
 .land .pill{box-shadow:0 0 26px rgba(201,169,97,.28)}
 .mark{width:68px;height:68px;border-radius:18px}
 .land-top .mark{width:52px;height:52px;border-radius:14px}
-      
+
+/* ===== Bouton Google ===== */
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#17201A;font-weight:700;border-radius:999px;padding:14px;box-shadow:none}
+.or{display:flex;align-items:center;gap:10px;margin:16px 0 8px;color:var(--mute);font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ===== Pages Conditions et Confidentialité ===== */
+.legal h2{font-size:19px;margin:24px 0 8px}
+.legal h2:first-child{margin-top:0}
+.legal p,.legal li{line-height:1.65;margin:0 0 10px}
+.legal ul{padding-left:20px;margin:0 0 12px}
+.legal a{color:var(--g);font-weight:600}
+.legal .stamp{font-size:13px;color:var(--mute)}
+.legalnote{font-size:12px;line-height:1.5;color:var(--mute);margin:12px 0 0;text-align:center}
+.legalnote a,.foot a{color:var(--gold);text-decoration:underline}
+
+/* ===== Articles pour adultes : image floutée ===== */
+.adult-wrap{position:relative;display:block;overflow:hidden;padding:0;border:0;box-shadow:none;background:#1b1f1c;cursor:pointer}
+.adult-wrap img{width:100%;height:100%;aspect-ratio:auto;margin:0;border-radius:0;object-fit:cover;display:block;filter:blur(28px);transform:scale(1.25)}
+.adult-badge{position:absolute;inset:0;display:grid;place-content:center;gap:4px;padding:8px;text-align:center;color:#fff;font-weight:800;font-size:15px;text-shadow:0 1px 8px rgba(0,0,0,.7);background:rgba(0,0,0,.25)}
+.adult-badge small{font-weight:600;font-size:12px;opacity:.9}
+.grid2 .adult-wrap{width:100%;aspect-ratio:1;border-radius:14px;margin-bottom:6px}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:600;margin:14px 0 4px}
+.check input{width:22px;height:22px;flex:none;margin-top:2px}
+    
