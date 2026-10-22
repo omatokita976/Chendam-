@@ -34,7 +34,8 @@ export default function Conditions() {
       <ul>
         <li>Chaque article doit avoir une photo réelle, un titre clair, un prix en FCFA, un état et une ville honnêtes.</li>
         <li>Tu ne publies que ce que tu as le droit de vendre.</li>
-        <li>Sont interdits : les armes et munitions, les drogues, les produits volés ou contrefaits, les médicaments, les animaux et espèces protégés (ivoire, pangolin, etc.), les faux documents, les contenus sexuels, les données personnelles d’autres personnes, et tout article dont la vente est interdite par la loi camerounaise.</li>
+        <li>Sont interdits : les armes et munitions, les drogues, les produits volés ou contrefaits, les médicaments, les animaux et espèces protégés (ivoire, pangolin, etc.), les faux documents, la pornographie, les images de nudité ou de sexe explicite, les services sexuels ou d’escorte, tout contenu impliquant des mineurs, les données personnelles d’autres personnes, et tout article dont la vente est interdite par la loi camerounaise.</li>
+        <li>Les articles pour adultes (par exemple jouets intimes, cartes érotiques, lingerie) sont tolérés à trois conditions : tu coches « Article pour adultes » en publiant, ce qui floute la photo tant qu’on ne la touche pas ; la photo montre l’objet seul, sans personne nue ni image explicite ; et le site reste réservé aux personnes de 18 ans et plus. Nous pouvons flouter, refuser ou retirer toute annonce de ce type.</li>
         <li>Nous pouvons retirer sans préavis toute publication qui ne respecte pas ces règles.</li>
       </ul>
 
@@ -44,7 +45,7 @@ export default function Conditions() {
         <li>les arnaques, les faux articles, l’usurpation d’identité ;</li>
         <li>le harcèlement, les menaces, les insultes ;</li>
         <li>les propos haineux ou discriminatoires (tribalisme, racisme, sexisme, etc.) ;</li>
-        <li>les contenus violents, choquants ou sexuels ;</li>
+        <li>les contenus violents, choquants ou pornographiques ;</li>
         <li>le spam, la publicité non autorisée, la collecte des données des autres membres ;</li>
         <li>toute tentative de piratage ou de contournement du site.</li>
       </ul>
@@ -104,5 +105,4 @@ export default function Conditions() {
       <p><a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a></p>
     </LegalShell>
   );
-      }
-          
+}
