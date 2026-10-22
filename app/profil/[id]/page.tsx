@@ -7,8 +7,9 @@ import { useMe } from "@/lib/useMe";
 import { relWith, countFriends, plural, type Rel } from "@/lib/friends";
 import Shell, { Av } from "@/components/Shell";
 import ReportButton from "@/components/ReportButton";
+import AdultImage from "@/components/AdultImage";
 
-type Item = { id: number; title: string; price_fcfa: number; photo_urls: string[] };
+type Item = { id: number; title: string; price_fcfa: number; photo_urls: string[]; adult: boolean };
 
 export default function PublicProfile() {
   const me = useMe();
@@ -27,7 +28,7 @@ export default function PublicProfile() {
   useEffect(() => {
     if (!me) return;
     supabase.from("profiles").select("name,ville,photo_url").eq("id", id).single().then(({ data }) => setP(data));
-    supabase.from("posts").select("id,title,price_fcfa,photo_urls").eq("seller_id", id).eq("status", "active")
+    supabase.from("posts").select("id,title,price_fcfa,photo_urls,adult").eq("seller_id", id).eq("status", "active")
       .order("created_at", { ascending: false }).then(({ data }) => setItems((data as Item[]) ?? []));
     reload();
   }, [me, id, reload]);
@@ -64,7 +65,7 @@ export default function PublicProfile() {
       {items.length === 0 ? <div className="card meta">Aucun article en vente.</div> : (
         <div className="grid2">
           {items.map((i) => (
-            <div key={i.id}><img alt={i.title} src={i.photo_urls[0]} /><div><strong>{i.title}</strong></div><span className="price">{fcfa(i.price_fcfa)}</span></div>
+            <div key={i.id}><AdultImage adult={i.adult} alt={i.title} src={i.photo_urls[0]} /><div><strong>{i.title}</strong></div><span className="price">{fcfa(i.price_fcfa)}</span></div>
           ))}
         </div>
       )}
