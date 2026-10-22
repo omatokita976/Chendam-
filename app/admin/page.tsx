@@ -4,15 +4,16 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useMe } from "@/lib/useMe";
 import Shell, { Av } from "@/components/Shell";
+import AdultImage from "@/components/AdultImage";
 
 type R = {
   id: number; reason: string; status: string; decision: string | null; created_at: string; evidence_urls: string[];
   reporter: { name: string } | null;
   reported: { id: string; name: string; is_banned: boolean; photo_url: string | null } | null;
-  posts: { id: number; title: string; photo_urls: string[]; status: string } | null;
+  posts: { id: number; title: string; photo_urls: string[]; status: string; adult: boolean } | null;
 };
 type U = { id: string; name: string; photo_url: string | null; ville: string | null; is_banned: boolean; role: string; created_at?: string };
-type PostRow = { id: number; title: string; price_fcfa: number; photo_urls: string[]; status: string; created_at: string; profiles: { name: string } | null };
+type PostRow = { id: number; title: string; price_fcfa: number; photo_urls: string[]; status: string; created_at: string; adult: boolean; profiles: { name: string } | null };
 
 // Double authentification : code à 6 chiffres d'une application (Google Authenticator, etc.)
 function Mfa({ onDone }: { onDone: () => void }) {
@@ -82,7 +83,7 @@ export default function Admin() {
 
   const loadR = useCallback(async () => {
     const { data } = await supabase.from("reports")
-      .select("*, reporter:profiles!reporter_id(name), reported:profiles!reported_user_id(id,name,is_banned,photo_url), posts(id,title,photo_urls,status)")
+      .select("*, reporter:profiles!reporter_id(name), reported:profiles!reported_user_id(id,name,is_banned,photo_url), posts(id,title,photo_urls,status,adult)")
       .order("created_at", { ascending: false }).limit(100);
     const list = ((data as any) ?? []) as R[];
     setRs(list);
@@ -117,7 +118,7 @@ export default function Admin() {
   }, []);
   // Toutes les publications, pour pouvoir en supprimer une directement
   const loadP = useCallback(async () => {
-    const { data } = await supabase.from("posts").select("id,title,price_fcfa,photo_urls,status,created_at,profiles!seller_id(name)")
+    const { data } = await supabase.from("posts").select("id,title,price_fcfa,photo_urls,status,created_at,adult,profiles!seller_id(name)")
       .order("created_at", { ascending: false }).limit(60);
     setPs((data as any) ?? []);
   }, []);
@@ -177,6 +178,12 @@ export default function Admin() {
     loadP(); loadStats();
   };
 
+  const toggleAdult = async (p: PostRow) => {
+    setErr("");
+    fail((await supabase.from("posts").update({ adult: !p.adult }).eq("id", p.id)).error);
+    loadP();
+  };
+
   const open = rs.filter((r) => r.status === "open");
   const shown = showDone ? rs.filter((r) => r.status !== "open") : open;
 
@@ -218,14 +225,14 @@ export default function Admin() {
         {ps.map((p) => (
           <div className="card" key={p.id}>
             <div className="row">
-              <img alt={p.title} src={p.photo_urls[0]} style={{ width: 72, height: 72, borderRadius: 12, objectFit: "cover" }} />
+              <AdultImage adult={p.adult} alt={p.title} src={p.photo_urls[0]} style={{ width: 72, height: 72, borderRadius: 12, objectFit: "cover" }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <strong>{p.title}</strong>
                 <div className="meta">{p.profiles?.name ?? "?"} · {new Date(p.created_at).toLocaleDateString("fr-FR")}</div>
                 <span className="price">{p.price_fcfa.toLocaleString("fr-FR")} FCFA</span>
               </div>
             </div>
-            <p><button onClick={() => removePost(p)}>Supprimer la publication</button></p>
+            <p className="row" style={{ flexWrap: "wrap" }}><button onClick={() => removePost(p)}>Supprimer la publication</button><button className="ghost" onClick={() => toggleAdult(p)}>{p.adult ? "Retirer le flou 18+" : "Flouter (18+)"}</button></p>
           </div>
         ))}
       </>)}
@@ -244,7 +251,7 @@ export default function Admin() {
                 {r.reported.is_banned && <span className="tag" style={{ color: "var(--r)" }}>Banni</span>}
               </div>
             )}
-            {r.posts && (<div><img className="ph" alt={r.posts.title} src={r.posts.photo_urls[0]} /><strong>{r.posts.title}</strong></div>)}
+            {r.posts && (<div><AdultImage adult={r.posts.adult} className="ph" alt={r.posts.title} src={r.posts.photo_urls[0]} /><strong>{r.posts.title}</strong></div>)}
             {r.evidence_urls.length > 0 && (
               <div className="thumbs">
                 {r.evidence_urls.map((p) => urls[p] ? <a key={p} href={urls[p]} target="_blank" rel="noreferrer"><img alt="Preuve" src={urls[p]} /></a> : null)}
@@ -282,5 +289,5 @@ export default function Admin() {
       </>)}
     </Shell>
   );
-}
-  
+    }
+    
